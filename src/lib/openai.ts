@@ -27,7 +27,7 @@ Messages should be short, use present tense, and follow conventional commit styl
     model: OPENAI_MODEL,
     messages: [{ role: 'user', content: prompt }],
   });
-
+  console.log(completion.choices[0].message);
   const raw = completion.choices[0].message.content?.trim() || '';
   const lines = raw.split('\n').filter((line) => line.trim() !== '');
   return lines.slice(0, count); // Just in case the model got a little too chatty

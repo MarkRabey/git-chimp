@@ -2,6 +2,7 @@ import { generateCommitMessages } from '../lib/openai.js';
 import { simpleGit } from 'simple-git';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
+import { cleanCommitMessages } from '../utils/format.js';
 
 const git = simpleGit();
 
@@ -14,7 +15,7 @@ export async function handleCommitCommand(options: {
 
     if (!diff) {
       console.log(chalk.yellow('⚠️ No staged changes found.'));
-      return;
+      process.exit(0);
     }
 
     // 1. Custom message flow
@@ -44,7 +45,8 @@ export async function handleCommitCommand(options: {
     }
 
     // 3. Interactive picker (default flow)
-    const messages = await generateCommitMessages(diff);
+    const rawSuggestions = await generateCommitMessages(diff);
+    const messages = cleanCommitMessages(rawSuggestions);
     messages.push('✏️ Write my own');
 
     const { selectedMessage } = await inquirer.prompt([
