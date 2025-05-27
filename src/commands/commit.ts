@@ -52,7 +52,10 @@ export async function handleCommitCommand(options: {
         type: 'list',
         name: 'selectedMessage',
         message: 'Pick a commit message:',
-        choices: messages,
+        choices: messages.map((msg, index) => ({
+          name: `${index + 1}. ${msg}`,
+          value: msg,
+        })),
       },
     ]);
 
