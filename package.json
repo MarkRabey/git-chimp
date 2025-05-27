@@ -18,6 +18,7 @@
     "@octokit/rest": "^22.0.0",
     "chalk": "^5.4.1",
     "dotenv": "^16.5.0",
+    "inquirer": "^12.6.3",
     "openai": "^4.103.0",
     "simple-git": "^3.27.0"
   },

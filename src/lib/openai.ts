@@ -9,16 +9,18 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function generateCommitMessage(
-  diff: string
-): Promise<string> {
+export async function generateCommitMessages(
+  diff: string,
+  count = 3
+): Promise<string[]> {
   const prompt = `
 You are a helpful assistant that writes concise, conventional commit messages based on Git diffs.
 
 Here is the diff:
 ${diff}
 
-Respond with a single commit message in present tense, without quotation marks.
+Respond with ${count} different commit message options, each on its own line.
+Messages should be short, use present tense, and follow conventional commit style.
   `;
 
   const completion = await openai.chat.completions.create({
@@ -26,10 +28,9 @@ Respond with a single commit message in present tense, without quotation marks.
     messages: [{ role: 'user', content: prompt }],
   });
 
-  return (
-    completion.choices[0].message.content?.trim() ||
-    'chore: update code'
-  );
+  const raw = completion.choices[0].message.content?.trim() || '';
+  const lines = raw.split('\n').filter((line) => line.trim() !== '');
+  return lines.slice(0, count); // Just in case the model got a little too chatty
 }
 
 export async function generatePullRequestDescription(

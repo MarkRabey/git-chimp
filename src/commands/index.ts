@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { handleCommit } from './commit.js';
+import { handleCommitCommand } from './commit.js';
 import { handlePR } from './pr.js';
 import { handleInit } from './init.js';
 // Import JSON using createRequire for NodeNext compatibility
@@ -22,7 +22,7 @@ export function runCLI() {
     .description(
       'Generate a commit message with GPT based on staged changes'
     )
-    .action(handleCommit);
+    .action(handleCommitCommand);
 
   program
     .command('pr')

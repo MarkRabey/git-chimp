@@ -1,35 +1,40 @@
-import chalk from 'chalk';
+import { generateCommitMessages } from '../lib/openai.js';
 import { simpleGit } from 'simple-git';
-import { generateCommitMessage } from '../lib/openai.js';
+import inquirer from 'inquirer';
+import chalk from 'chalk';
 
 const git = simpleGit();
 
-export async function handleCommit() {
+export async function handleCommitCommand() {
   try {
-    const status = await git.status();
+    const diff = await git.diff(['--staged']);
 
-    if (status.staged.length === 0) {
-      console.log(chalk.red('❌ No staged changes to commit.'));
+    if (!diff) {
+      console.log(
+        chalk.yellow(
+          '⚠️ No staged changes found. Stage files before running this command.'
+        )
+      );
       return;
     }
 
-    console.log(
-      chalk.blue('🔍 Generating commit message with AI...')
-    );
+    const messages = await generateCommitMessages(diff);
 
-    const diff = await git.diff(['--cached']);
-    const message = await generateCommitMessage(diff);
+    const { selectedMessage } = await inquirer.prompt([
+      {
+        type: 'list',
+        name: 'selectedMessage',
+        message: 'Pick a commit message:',
+        choices: messages,
+      },
+    ]);
 
-    console.log(chalk.green('\n📝 Suggested commit message:'));
-    console.log(chalk.cyanBright(`\n  "${message}"\n`));
-
-    await git.commit(message);
-    console.log(chalk.green('✅ Commit successful!'));
+    await git.commit(selectedMessage);
+    console.log(chalk.green('✅ Commit created!'));
   } catch (error) {
     console.error(
-      chalk.red('🔥 Failed to generate or commit message:'),
+      chalk.red('❌ Error generating or committing message:'),
       error
     );
-    process.exit(1);
   }
 }
