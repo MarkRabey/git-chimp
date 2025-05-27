@@ -1,4 +1,4 @@
-import simpleGit from 'simple-git';
+import { simpleGit } from 'simple-git';
 import { config } from 'dotenv';
 import { OpenAI } from 'openai';
 
@@ -8,7 +8,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function runCommitFlow() {
+export async function handleCommit() {
   const diff = await git.diff(['--cached']);
   if (!diff) {
     console.log('No staged changes found.');

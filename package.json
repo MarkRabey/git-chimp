@@ -1,14 +1,14 @@
 {
   "name": "commit-chimp",
   "version": "0.1.0",
-  "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  },"type": "module",
   "bin": {
     "commit-chimp": "./dist/cli.js"
   },
-  "type": "module",
+  "main": "./dist/cli.js",
   "keywords": [],
   "author": "Mark Rabey <mark@markrabey.com> (http://markrabey.com/)",
   "license": "ISC",
