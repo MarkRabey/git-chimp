@@ -22,6 +22,11 @@ export function runCLI() {
     .description(
       'Generate a commit message with GPT based on staged changes'
     )
+    .option('-c, --custom', 'Write a custom commit message')
+    .option(
+      '-m, --message',
+      'Non-interactive mode, output commit message to stdout'
+    )
     .action(handleCommitCommand);
 
   program
