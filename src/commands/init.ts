@@ -3,9 +3,7 @@ import path from 'path';
 import readline from 'readline';
 import { fileURLToPath } from 'url';
 import os from 'os';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const envPath = path.resolve(__dirname, '../../.env');
+import chalk from 'chalk';
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -20,6 +18,16 @@ function ask(question: string): Promise<string> {
 
 export async function handleInit() {
   console.log('\n🧠 Let’s set up commit-chimp 🐒\n');
+
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const envPath = path.resolve(__dirname, '../../.env');
+
+  if (fs.existsSync(envPath)) {
+    console.log(
+      chalk.yellow('⚠️  .env file already exists. Not overwriting.')
+    );
+    process.exit(1);
+  }
 
   const openai = await ask('Enter your OpenAI API key: ');
   const github = await ask(
@@ -39,8 +47,8 @@ export async function handleInit() {
 
   try {
     fs.writeFileSync(envPath, envVars + os.EOL);
-    console.log(`\n✅ Configuration saved to .env`);
+    console.log(chalk.green(`\n✅ Configuration saved to .env`));
   } catch (err) {
-    console.error('❌ Failed to write .env file:', err);
+    console.error(chalk.red('❌ Failed to write .env file:'), err);
   }
 }

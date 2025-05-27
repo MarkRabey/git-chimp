@@ -1,60 +1,53 @@
+import chalk from 'chalk';
 import { simpleGit } from 'simple-git';
-import * as dotenv from 'dotenv';
 import { Octokit } from '@octokit/rest';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// Load environment variables
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
-
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const GITHUB_REPO = process.env.GITHUB_REPO; // e.g. "user/repo"
-
-if (!GITHUB_TOKEN || !GITHUB_REPO) {
-  console.error(
-    '❌ Missing GITHUB_TOKEN or GITHUB_REPO in environment variables.'
-  );
-  process.exit(1);
-}
-
-const octokit = new Octokit({ auth: GITHUB_TOKEN });
+import { generatePullRequestDescription } from '../lib/openai.js';
 
 export async function handlePR() {
+  if (!process.env.GITHUB_TOKEN || !process.env.GITHUB_REPO) {
+    console.error(
+      chalk.red(
+        '❌ Missing GITHUB_TOKEN or GITHUB_REPO in environment variables.'
+      )
+    );
+    return;
+  }
+
   const git = simpleGit();
+  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
   try {
-    const status = await git.status();
-    const currentBranch = status.current;
+    const currentBranch = (await git.branch()).current;
 
-    if (!currentBranch) {
-      console.error('❌ Could not determine current Git branch.');
-      process.exit(1);
-    }
+    console.log(
+      chalk.blue(
+        `📦 Creating PR for branch: ${chalk.bold(currentBranch)}`
+      )
+    );
+    console.log(
+      chalk.blue('🔍 Generating pull request description with AI...')
+    );
 
-    const commits = await git.log({ n: 5 });
-    const commitMessages = commits.all
-      .map((c) => `- ${c.message}`)
-      .join('\n');
+    const diff = await git.diff(['main', currentBranch]);
+    const description = await generatePullRequestDescription(diff);
 
-    const title =
-      commits.latest?.message || `Update from ${currentBranch}`;
-    const body = `### Changes:\n\n${commitMessages}`;
+    const [owner, repo] = process.env.GITHUB_REPO.split('/');
 
-    const [owner, repo] = GITHUB_REPO?.split('/') || [];
-
-    const { data: pr } = await octokit.rest.pulls.create({
+    const pr = await octokit.rest.pulls.create({
       owner,
       repo,
+      title: `🚀 ${currentBranch}`,
       head: currentBranch,
-      base: 'main', // or 'develop' or configurable later
-      title,
-      body,
+      base: 'main',
+      body: description,
     });
 
-    console.log(`✅ PR created: ${pr.html_url}`);
-  } catch (err) {
-    console.error('❌ Failed to create PR:', err);
-    process.exit(1);
+    console.log(
+      chalk.green(
+        `✅ PR created: ${chalk.underline.blue(pr.data.html_url)}`
+      )
+    );
+  } catch (error) {
+    console.error(chalk.red('🔥 Failed to create PR:'), error);
   }
 }

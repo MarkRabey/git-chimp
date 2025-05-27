@@ -4,7 +4,8 @@
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },"type": "module",
+  },
+  "type": "module",
   "bin": {
     "commit-chimp": "./dist/cli.js"
   },
@@ -15,6 +16,7 @@
   "description": "",
   "dependencies": {
     "@octokit/rest": "^22.0.0",
+    "chalk": "^5.4.1",
     "dotenv": "^16.5.0",
     "openai": "^4.103.0",
     "simple-git": "^3.27.0"

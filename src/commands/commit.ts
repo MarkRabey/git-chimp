@@ -1,27 +1,35 @@
+import chalk from 'chalk';
 import { simpleGit } from 'simple-git';
-import { config } from 'dotenv';
-import { OpenAI } from 'openai';
+import { generateCommitMessage } from '../lib/openai.js';
 
-config();
 const git = simpleGit();
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 export async function handleCommit() {
-  const diff = await git.diff(['--cached']);
-  if (!diff) {
-    console.log('No staged changes found.');
-    return;
+  try {
+    const status = await git.status();
+
+    if (status.staged.length === 0) {
+      console.log(chalk.red('❌ No staged changes to commit.'));
+      return;
+    }
+
+    console.log(
+      chalk.blue('🔍 Generating commit message with AI...')
+    );
+
+    const diff = await git.diff(['--cached']);
+    const message = await generateCommitMessage(diff);
+
+    console.log(chalk.green('\n📝 Suggested commit message:'));
+    console.log(chalk.cyanBright(`\n  "${message}"\n`));
+
+    await git.commit(message);
+    console.log(chalk.green('✅ Commit successful!'));
+  } catch (error) {
+    console.error(
+      chalk.red('🔥 Failed to generate or commit message:'),
+      error
+    );
+    process.exit(1);
   }
-
-  const prompt = `Summarize the following git diff into a useful commit message:\n\n${diff}`;
-  const completion = await openai.chat.completions.create({
-    model: 'gpt-4',
-    messages: [{ role: 'user', content: prompt }],
-  });
-
-  const suggestion =
-    completion.choices[0].message.content?.trim() || 'chore: update';
-  console.log(`Suggested commit message:\n${suggestion}`);
 }
