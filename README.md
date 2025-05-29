@@ -4,7 +4,7 @@
 
 [![npm version](https://img.shields.io/npm/v/git-chimp)](https://www.npmjs.com/package/git-chimp)
 [![GitHub license](https://img.shields.io/github/license/MarkRabey/git-chimp)](https://github.com/MarkRabey/git-chimp/blob/main/LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/MarkRabey/git-chimp/ci.yml)](https://github.com/MarkRabey/git-chimp/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/MarkRabey/git-chimp/release.yml)](https://github.com/MarkRabey/git-chimp/actions)
 
 ---
 
