@@ -1,3 +1,10 @@
+## [0.4.1](https://github.com/MarkRabey/git-chimp/compare/v0.4.0...v0.4.1) (2025-05-29)
+
+
+### Bug Fixes
+
+* **workflow:** trigger release on push to main instead of PR merge ([74fd14b](https://github.com/MarkRabey/git-chimp/commit/74fd14b5613f6c43cb612437d753d9a34a1fcfd9))
+
 # [0.4.0](https://github.com/MarkRabey/git-chimp/compare/v0.3.0...v0.4.0) (2025-05-29)
 
 
