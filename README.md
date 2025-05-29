@@ -70,6 +70,7 @@ GITHUB_REPO=username/repo
 ```json
 {
   "config": {
+    "tone": "sarcastic",
     "enforceSemanticPrTitles": true,
     "model": "gpt-4"
   }

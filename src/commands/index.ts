@@ -39,7 +39,15 @@ export function runCLI() {
     .description(
       'Generate a commit message with GPT based on staged changes'
     )
+    .option(
+      '--tone <tone>',
+      'Set the tone of the message (e.g. sarcastic, friendly, neutral)'
+    )
     .option('-c, --custom', 'Write a custom commit message')
+    .option(
+      '--tone <tone>',
+      'Set the tone of the message (e.g. sarcastic, friendly, neutral)'
+    )
     .option(
       '-m, --message',
       'Non-interactive mode, output commit message to stdout'
@@ -48,6 +56,10 @@ export function runCLI() {
 
   program
     .command('pr')
+    .option(
+      '--tone <tone>',
+      'Set the tone of the message (e.g. sarcastic, friendly, neutral)'
+    )
     .option(
       '-u, --update',
       'Automatically update existing PR if it exists',

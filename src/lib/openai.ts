@@ -13,10 +13,12 @@ const openai = new OpenAI({
 
 export async function generateCommitMessages(
   diff: string,
-  count = 3
+  count = 3,
+  tone?: string
 ): Promise<string[]> {
+  const toneDescription = tone ? ` with a ${tone} tone` : '';
   const prompt = `
-You are a helpful assistant that writes concise, conventional commit messages based on Git diffs.
+You are a helpful assistant that writes concise, conventional commit messages based on Git diffs${toneDescription}.
 
 Here is the diff:
 ${diff}
@@ -36,10 +38,12 @@ Messages should be short, use present tense, and follow conventional commit styl
 }
 
 export async function generatePullRequestDescription(
-  diff: string
+  diff: string,
+  tone?: string
 ): Promise<string> {
+  const toneDescription = tone ? ` with a ${tone} tone` : '';
   const prompt = `
-You are a helpful assistant that writes professional pull request descriptions based on Git diffs.
+You are a helpful assistant that writes professional pull request descriptions based on Git diffs${toneDescription}.
 
 Here is the diff:
 ${diff}

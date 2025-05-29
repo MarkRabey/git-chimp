@@ -3,13 +3,25 @@ import { simpleGit } from 'simple-git';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import { cleanCommitMessages } from '../utils/format.js';
+import { ChimpConfig, loadConfig } from '../utils/config.js';
 
 const git = simpleGit();
 
-export async function handleCommitCommand(options: {
-  custom?: boolean;
-  message?: boolean;
-}) {
+export async function handleCommitCommand(
+  cliOptions?: Partial<ChimpConfig> & {
+    custom?: boolean;
+    message?: boolean;
+  }
+) {
+  const fileConfig = await loadConfig();
+  const config: ChimpConfig = {
+    ...fileConfig,
+    ...cliOptions,
+  };
+
+  const useCustomMessage = cliOptions?.custom || false;
+  const messageMode = cliOptions?.message || false;
+
   try {
     const diff = await git.diff(['--staged']);
 
@@ -19,7 +31,7 @@ export async function handleCommitCommand(options: {
     }
 
     // 1. Custom message flow
-    if (options.custom) {
+    if (useCustomMessage) {
       const { customMessage } = await inquirer.prompt([
         {
           type: 'input',
@@ -35,8 +47,12 @@ export async function handleCommitCommand(options: {
     }
 
     // 2. Non-interactive mode (for piping)
-    if (options.message) {
-      const messages = await generateCommitMessages(diff);
+    if (messageMode) {
+      const messages = await generateCommitMessages(
+        diff,
+        3,
+        config.tone
+      );
       const first = messages[0] ?? 'chore: update';
 
       // Output for piping into git
