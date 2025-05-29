@@ -1,9 +1,11 @@
 import { config } from 'dotenv';
 import OpenAI from 'openai';
+import { loadConfig } from '../utils/config.js';
 
 config();
 
-const OPENAI_MODEL = 'gpt-3.5-turbo';
+const chimpConfig = await loadConfig();
+const model = chimpConfig.model ?? 'gpt-3.5-turbo';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
@@ -24,7 +26,7 @@ Messages should be short, use present tense, and follow conventional commit styl
   `;
 
   const completion = await openai.chat.completions.create({
-    model: OPENAI_MODEL,
+    model,
     messages: [{ role: 'user', content: prompt }],
   });
 
@@ -46,7 +48,7 @@ Include a brief summary of the changes, mention any important context, and highl
   `;
 
   const completion = await openai.chat.completions.create({
-    model: OPENAI_MODEL,
+    model,
     messages: [{ role: 'user', content: prompt }],
   });
 

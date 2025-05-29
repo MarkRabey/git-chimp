@@ -4,6 +4,7 @@ import { handlePR } from './pr.js';
 import { handleInit } from './init.js';
 // Import JSON using createRequire for NodeNext compatibility
 import { createRequire } from 'node:module';
+import { handleConfig } from './config.js';
 const require = createRequire(import.meta.url);
 const { version } = require('../../package.json');
 
@@ -28,6 +29,17 @@ export function runCLI() {
       'Non-interactive mode, output commit message to stdout'
     )
     .action(handleCommitCommand);
+
+  program
+    .command('config')
+    .description(
+      'Get/set git-chimp configuration in .git-chimprc.json'
+    )
+    .option('-l, --list', 'List current config')
+    .option('-g, --get <key>', 'Get value by key')
+    .option('-s, --set <key>', 'Set value')
+    .option('-v, --value <val>', 'Value when used with --set')
+    .action(handleConfig);
 
   program
     .command('pr')
