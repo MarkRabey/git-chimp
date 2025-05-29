@@ -45,10 +45,6 @@ export function runCLI() {
     )
     .option('-c, --custom', 'Write a custom commit message')
     .option(
-      '--tone <tone>',
-      'Set the tone of the message (e.g. sarcastic, friendly, neutral)'
-    )
-    .option(
       '-m, --message',
       'Non-interactive mode, output commit message to stdout'
     )
