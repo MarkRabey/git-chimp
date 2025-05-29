@@ -3,7 +3,11 @@ import { simpleGit } from 'simple-git';
 import { Octokit } from '@octokit/rest';
 import { generatePullRequestDescription } from '../lib/openai.js';
 import readline from 'readline';
-import { loadConfig, validatePrTitle } from '../utils/config.js';
+import {
+  ChimpConfig,
+  loadConfig,
+  validatePrTitle,
+} from '../utils/config.js';
 import { guessSemanticPrefix } from '../utils/git.js';
 
 function askUser(question: string): Promise<string> {
@@ -20,9 +24,15 @@ function askUser(question: string): Promise<string> {
 }
 
 export async function handlePR(
-  options: { update?: boolean; semanticTitle?: boolean } = {}
+  cliOptions?: Partial<ChimpConfig> & { update?: boolean }
 ) {
-  const shouldAutoUpdate = options.update || false;
+  const shouldAutoUpdate = !!cliOptions?.update;
+
+  const fileConfig = await loadConfig(); // from .git-chimprc
+  const config: ChimpConfig = {
+    ...fileConfig,
+    ...cliOptions,
+  };
 
   if (!process.env.GITHUB_TOKEN || !process.env.GITHUB_REPO) {
     console.error(
@@ -94,18 +104,11 @@ export async function handlePR(
 
     const existingPR = existingPRs.data[0];
 
-    const chimpConfig = await loadConfig();
     let prTitle = `🚀 ${currentBranch}`;
 
-    // Decide whether to enforce semantic PR titles
-    const enforceSemantic =
-      typeof options.semanticTitle === 'boolean'
-        ? options.semanticTitle
-        : (chimpConfig.enforceSemanticPrTitles ?? false);
-
     // If enforcing and title is not valid, fix it
-    if (enforceSemantic) {
-      const isSemantic = validatePrTitle(prTitle, chimpConfig, {
+    if (config.enforceSemanticPrTitles) {
+      const isSemantic = validatePrTitle(prTitle, config, {
         throwOnError: false,
       });
       if (!isSemantic) {
@@ -117,7 +120,7 @@ export async function handlePR(
       }
     } else {
       // if not enforcing, just log a warning if not semantic
-      validatePrTitle(prTitle, chimpConfig, { throwOnError: false });
+      validatePrTitle(prTitle, config, { throwOnError: false });
     }
 
     if (existingPR) {

@@ -58,6 +58,10 @@ export function runCLI() {
       'Enforce semantic PR titles',
       (val) => val !== 'false'
     ) // handles true/false as strings
+    .option(
+      '--model <model>',
+      'OpenAI model to use (gpt-3.5-turbo | gpt-4 | gpt-4o | gpt-4o-mini)'
+    )
     .description(
       'Generate a pull request with GPT based on recent commits'
     )
