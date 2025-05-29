@@ -21,15 +21,16 @@ jobs:
           registry-url: 'https://registry.npmjs.org/'
 
       - name: Configure npm for publishing
-        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+        run: |
+          echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > ~/.npmrc
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - run: npm ci
 
       - run: npm whoami
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - run: npm ci
 
       - run: npx semantic-release
         env:
