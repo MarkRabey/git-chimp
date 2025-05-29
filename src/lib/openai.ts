@@ -6,7 +6,7 @@ config();
 const OPENAI_MODEL = 'gpt-3.5-turbo';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || '',
 });
 
 export async function generateCommitMessages(
