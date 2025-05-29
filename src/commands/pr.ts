@@ -10,7 +10,7 @@ export async function handlePR() {
         '❌ Missing GITHUB_TOKEN or GITHUB_REPO in environment variables.'
       )
     );
-    return;
+    process.exit(1);
   }
 
   const git = simpleGit();
@@ -47,7 +47,9 @@ export async function handlePR() {
         `✅ PR created: ${chalk.underline.blue(pr.data.html_url)}`
       )
     );
+    process.exit(0);
   } catch (error) {
     console.error(chalk.red('🔥 Failed to create PR:'), error);
+    process.exit(1);
   }
 }
