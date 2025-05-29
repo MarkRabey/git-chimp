@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/MarkRabey/git-chimp/compare/v0.3.0...v0.4.0) (2025-05-29)
+
+
+### Features
+
+* **commands:** add option to specify OpenAI model in CLI ([3d072ab](https://github.com/MarkRabey/git-chimp/commit/3d072ab020709577483cefe64f16a44c29fb2ac0))
+
 # [0.3.0](https://github.com/MarkRabey/git-chimp/compare/v0.2.0...v0.3.0) (2025-05-29)
 
 
