@@ -1,3 +1,10 @@
+## [0.4.3](https://github.com/MarkRabey/git-chimp/compare/v0.4.2...v0.4.3) (2025-05-29)
+
+
+### Bug Fixes
+
+* **scripts:** remove duplicate release trigger comment ([75fdfe1](https://github.com/MarkRabey/git-chimp/commit/75fdfe136cc366b3bd3e45b07c1ad0dc63ed4d94))
+
 ## [0.4.2](https://github.com/MarkRabey/git-chimp/compare/v0.4.1...v0.4.2) (2025-05-29)
 
 
