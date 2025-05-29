@@ -1,12 +1,21 @@
 {
-  "name": "commit-chimp",
-  "version": "0.1.0",
+  "name": "git-chimp",
+  "version": "0.0.0",
   "scripts": {
+    "clean": "rm -rf dist",
     "build": "tsc",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build",
+    "pack": "npm pack",
+    "release": "npm run clean && npm run build && npm publish",
+    "release:patch": "npm version patch && git push && git push --tags && npm run build",
+    "release:minor": "npm version minor && git push && git push --tags && npm run build",
+    "release:major": "npm version major && git push && git push --tags && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },"type": "module",
+  },
+  "type": "module",
   "bin": {
-    "commit-chimp": "./dist/cli.js"
+    "git-chimp": "./dist/cli.js"
   },
   "main": "./dist/cli.js",
   "keywords": [],
@@ -15,7 +24,9 @@
   "description": "",
   "dependencies": {
     "@octokit/rest": "^22.0.0",
+    "chalk": "^5.4.1",
     "dotenv": "^16.5.0",
+    "inquirer": "^12.6.3",
     "openai": "^4.103.0",
     "simple-git": "^3.27.0"
   },

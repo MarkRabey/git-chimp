@@ -1,60 +1,114 @@
+import chalk from 'chalk';
 import { simpleGit } from 'simple-git';
-import * as dotenv from 'dotenv';
 import { Octokit } from '@octokit/rest';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { generatePullRequestDescription } from '../lib/openai.js';
+import readline from 'readline';
 
-// Load environment variables
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
-
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-const GITHUB_REPO = process.env.GITHUB_REPO; // e.g. "user/repo"
-
-if (!GITHUB_TOKEN || !GITHUB_REPO) {
-  console.error(
-    '❌ Missing GITHUB_TOKEN or GITHUB_REPO in environment variables.'
-  );
-  process.exit(1);
+function askUser(question: string): Promise<string> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      rl.close();
+      resolve(answer.trim().toLowerCase());
+    });
+  });
 }
 
-const octokit = new Octokit({ auth: GITHUB_TOKEN });
-
 export async function handlePR() {
+  const shouldAutoUpdate = process.argv.includes('--update');
+
+  if (!process.env.GITHUB_TOKEN || !process.env.GITHUB_REPO) {
+    console.error(
+      chalk.red(
+        '❌ Missing GITHUB_TOKEN or GITHUB_REPO in environment variables.'
+      )
+    );
+    process.exit(1);
+  }
+
   const git = simpleGit();
+  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
   try {
-    const status = await git.status();
-    const currentBranch = status.current;
+    const currentBranch = (await git.branch()).current;
 
-    if (!currentBranch) {
-      console.error('❌ Could not determine current Git branch.');
-      process.exit(1);
-    }
+    console.log(
+      chalk.blue(
+        `📦 Preparing PR for branch: ${chalk.bold(currentBranch)}`
+      )
+    );
+    console.log(
+      chalk.blue('🔍 Generating pull request description with AI...')
+    );
 
-    const commits = await git.log({ n: 5 });
-    const commitMessages = commits.all
-      .map((c) => `- ${c.message}`)
-      .join('\n');
+    const diff = await git.diff(['main', currentBranch]);
+    const description = await generatePullRequestDescription(diff);
+    const [owner, repo] = process.env.GITHUB_REPO.split('/');
 
-    const title =
-      commits.latest?.message || `Update from ${currentBranch}`;
-    const body = `### Changes:\n\n${commitMessages}`;
-
-    const [owner, repo] = GITHUB_REPO?.split('/') || [];
-
-    const { data: pr } = await octokit.rest.pulls.create({
+    const existingPRs = await octokit.rest.pulls.list({
       owner,
       repo,
-      head: currentBranch,
-      base: 'main', // or 'develop' or configurable later
-      title,
-      body,
+      head: `${owner}:${currentBranch}`,
+      state: 'open',
     });
 
-    console.log(`✅ PR created: ${pr.html_url}`);
-  } catch (err) {
-    console.error('❌ Failed to create PR:', err);
+    const existingPR = existingPRs.data[0];
+
+    if (existingPR) {
+      console.log(
+        chalk.yellow(
+          `⚠️ A pull request already exists: ${chalk.underline(existingPR.html_url)}`
+        )
+      );
+
+      if (shouldAutoUpdate) {
+        console.log(chalk.blue('🔁 Updating existing PR...'));
+        await octokit.rest.pulls.update({
+          owner,
+          repo,
+          pull_number: existingPR.number,
+          body: description,
+        });
+        console.log(chalk.green('✅ PR updated successfully.'));
+      } else {
+        const answer = await askUser(
+          'Do you want to update the existing PR? (y/N): '
+        );
+        if (answer === 'y' || answer === 'yes') {
+          await octokit.rest.pulls.update({
+            owner,
+            repo,
+            pull_number: existingPR.number,
+            body: description,
+          });
+          console.log(chalk.green('✅ PR updated successfully.'));
+        } else {
+          console.log(chalk.gray('🚫 PR update canceled.'));
+        }
+      }
+    } else {
+      const pr = await octokit.rest.pulls.create({
+        owner,
+        repo,
+        title: `🚀 ${currentBranch}`,
+        head: currentBranch,
+        base: 'main',
+        body: description,
+      });
+
+      console.log(
+        chalk.green(
+          `✅ PR created: ${chalk.underline.blue(pr.data.html_url)}`
+        )
+      );
+    }
+
+    process.exit(0);
+  } catch (error) {
+    console.error(chalk.red('🔥 Failed to handle PR:'), error);
     process.exit(1);
   }
 }
