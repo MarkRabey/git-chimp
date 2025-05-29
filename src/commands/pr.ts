@@ -59,7 +59,10 @@ export async function handlePR(
     );
 
     const diff = await git.diff(['main', currentBranch]);
-    const description = await generatePullRequestDescription(diff);
+    const description = await generatePullRequestDescription(
+      diff,
+      config.tone
+    );
 
     let owner, repo;
 
