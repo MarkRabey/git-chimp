@@ -29,7 +29,8 @@ jobs:
       - name: Verify npm auth
         run: npm whoami
 
-      - run: npm whoami
+      - name: Try publishing dry run
+        run: npm publish --dry-run
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
