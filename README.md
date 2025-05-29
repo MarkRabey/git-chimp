@@ -69,26 +69,28 @@ GITHUB_REPO=username/repo
 
 ```json
 {
-  "config": {
-    "tone": "sarcastic",
-    "enforceSemanticPrTitles": true,
-    "model": "gpt-4"
-  }
+  "tone": "sarcastic",
+  "enforceSemanticPrTitles": true,
+  "model": "gpt-4o",
+  "prMode": "draft"
 }
 ```
 
 ### Available Config Options
 
-| Key                       | Type      | Description                                                                     |
-| ------------------------- | --------- | ------------------------------------------------------------------------------- |
-| `enforceSemanticPrTitles` | `boolean` | If `true`, the PR title will follow semantic-release style (e.g., `feat:`).     |
-| `model`                   | `string`  | OpenAI model to use. One of: `gpt-3.5-turbo`, `gpt-4`, `gpt-4o`, `gpt-4o-mini`. |
+| Key                       | Type      | Description                                                                         |
+| ------------------------- | --------- | ----------------------------------------------------------------------------------- |
+| `tone`                    | `string`  | Sets the writing style, e.g., `"corporate-safe"`, `"dry sarcasm"`, `"chaotic evil"` |
+| `model`                   | `string`  | OpenAI model to use. One of: `gpt-3.5-turbo`, `gpt-4`, `gpt-4o`, `gpt-4o-mini`      |
+| `enforceSemanticPrTitles` | `boolean` | If `true`, PR titles follow semantic-release style (e.g., `feat:`)                  |
+| `prMode`                  | `string`  | One of: `open` (default), `draft`, or `display` (just show the PR content)          |
+
 
 ### Command-Line Overrides
 You can also override certain config options via CLI flags (these take precedence over `.git-chimprc`):
 
 ```bash
-git-chimp pr --semantic-title false
+git-chimp pr --tone "inspired by Linus Torvalds" --model gpt-4o --pr-mode draft
 ```
 
 That would skip enforcing semantic PR title style for that invocation, regardless of the `.git-chimprc` setting.
@@ -116,8 +118,13 @@ git-chimp commit
 
 #### Options:
 
-- `-c`, `--custom` – Write a custom commit message instead of using GPT (you absolute control freak)
-- `-m`, `--message` – Non-interactive mode: print GPT's message to stdout and exit. Great for scripting or CI.
+| Flag              | Description                                                              |
+| ----------------- | ------------------------------------------------------------------------ |
+| `--tone <style>`  | Optional writing style for commit messages (e.g., `"corporate-safe"`)    |
+| `--model <model>` | OpenAI model to use (e.g., `gpt-3.5-turbo`, `gpt-4o`)                    |
+| `-c`, `--custom`  | Use your own lovingly typed commit message (you beautiful control freak) |
+| `-m`, `--message` | Print GPT commit messages to stdout and exit (good for CI, scripting)    |
+
 
 ### `pr`
 
@@ -129,7 +136,24 @@ Generates a PR description and opens one on GitHub.
 
 #### Options:
 
-- `-u`, `--update` – Automatically update an existing PR if one already exists for the branch.
+| Flag               | Description                                                            |
+| ------------------ | ---------------------------------------------------------------------- |
+| `--tone <style>`   | Optional writing style for the PR (e.g., `"professional"`, `"snarky"`) |
+| `--model <model>`  | OpenAI model to use for generation                                     |
+| `--pr-mode <mode>` | One of: `open`, `draft`, or `display`                                  |
+| `-u`, `--update`   | Updates an existing PR instead of creating a new one (if it exists)    |
+
+---
+## 💡 Pro Tip
+The config system is merge-friendly. It works like this (highest priority wins):
+
+Command-line flags (e.g., --tone)
+
+.git-chimprc config
+
+Defaults baked into the tool
+
+So yeah—you can go full control freak without ever touching a config file, or commit to the chimp with a persistent setup.
 
 ---
 

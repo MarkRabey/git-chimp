@@ -43,6 +43,10 @@ export function runCLI() {
       '--tone <tone>',
       'Set the tone of the message (e.g. sarcastic, friendly, neutral)'
     )
+    .option(
+      '--model <model>',
+      'OpenAI model to use (gpt-3.5-turbo | gpt-4 | gpt-4o | gpt-4o-mini)'
+    )
     .option('-c, --custom', 'Write a custom commit message')
     .option(
       '-m, --message',
@@ -52,6 +56,10 @@ export function runCLI() {
 
   program
     .command('pr')
+    .option(
+      '--pr-mode <mode>',
+      'Set PR mode: open, draft, or display'
+    )
     .option(
       '--tone <tone>',
       'Set the tone of the message (e.g. sarcastic, friendly, neutral)'
