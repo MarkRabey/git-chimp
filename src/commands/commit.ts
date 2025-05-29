@@ -51,7 +51,8 @@ export async function handleCommitCommand(
       const messages = await generateCommitMessages(
         diff,
         3,
-        config.tone
+        config.tone,
+        config.model
       );
       const first = messages[0] ?? 'chore: update';
 

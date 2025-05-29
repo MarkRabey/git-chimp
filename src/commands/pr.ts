@@ -24,7 +24,10 @@ function askUser(question: string): Promise<string> {
 }
 
 export async function handlePR(
-  cliOptions?: Partial<ChimpConfig> & { update?: boolean }
+  cliOptions?: Partial<ChimpConfig> & {
+    update?: boolean;
+    prMode?: 'open' | 'draft' | 'display';
+  }
 ) {
   const shouldAutoUpdate = !!cliOptions?.update;
 
@@ -59,10 +62,50 @@ export async function handlePR(
     );
 
     const diff = await git.diff(['main', currentBranch]);
+    let prTitle = `🚀 ${currentBranch}`;
+
+    // If enforcing and title is not valid, fix it
+    if (config.enforceSemanticPrTitles) {
+      const isSemantic = validatePrTitle(prTitle, config, {
+        throwOnError: false,
+      });
+      if (!isSemantic) {
+        const prefix = guessSemanticPrefix(diff);
+        console.log(
+          chalk.gray(`🤖 Guessed semantic prefix: ${prefix}`)
+        );
+        prTitle = `${prefix}: ${currentBranch}`;
+      }
+    } else {
+      // if not enforcing, just log a warning if not semantic
+      validatePrTitle(prTitle, config, { throwOnError: false });
+    }
+
     const description = await generatePullRequestDescription(
       diff,
-      config.tone
+      config.tone,
+      config.model
     );
+
+    const prMode = config?.prMode ?? 'open';
+
+    const validModes = ['open', 'draft', 'display'];
+    if (!validModes.includes(prMode)) {
+      console.error(
+        chalk.red(
+          `Invalid prMode: ${prMode}. Must be one of ${validModes.join(', ')}`
+        )
+      );
+      process.exit(1);
+    }
+
+    if (prMode === 'display') {
+      console.log(chalk.blue(`\n--- PR Title ---\n${prTitle}\n`));
+      console.log(
+        chalk.blue(`\n--- PR Description ---\n${description}\n`)
+      );
+      process.exit(0);
+    }
 
     let owner, repo;
 
@@ -107,25 +150,6 @@ export async function handlePR(
 
     const existingPR = existingPRs.data[0];
 
-    let prTitle = `🚀 ${currentBranch}`;
-
-    // If enforcing and title is not valid, fix it
-    if (config.enforceSemanticPrTitles) {
-      const isSemantic = validatePrTitle(prTitle, config, {
-        throwOnError: false,
-      });
-      if (!isSemantic) {
-        const prefix = guessSemanticPrefix(diff);
-        console.log(
-          chalk.gray(`🤖 Guessed semantic prefix: ${prefix}`)
-        );
-        prTitle = `${prefix}: ${currentBranch}`;
-      }
-    } else {
-      // if not enforcing, just log a warning if not semantic
-      validatePrTitle(prTitle, config, { throwOnError: false });
-    }
-
     if (existingPR) {
       console.log(
         chalk.yellow(
@@ -152,6 +176,7 @@ export async function handlePR(
             repo,
             pull_number: existingPR.number,
             body: description,
+            draft: prMode === 'draft',
           });
           console.log(chalk.green('✅ PR updated successfully.'));
         } else {
