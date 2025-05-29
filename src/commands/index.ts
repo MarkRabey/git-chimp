@@ -4,6 +4,7 @@ import { handlePR } from './pr.js';
 import { handleInit } from './init.js';
 // Import JSON using createRequire for NodeNext compatibility
 import { createRequire } from 'node:module';
+import { handleConfig } from './config.js';
 const require = createRequire(import.meta.url);
 const { version } = require('../../package.json');
 
@@ -16,6 +17,22 @@ export function runCLI() {
       'Automate your commit messages and PRs with GPT. Because writing them sucks.'
     )
     .version(version);
+
+  program
+    .command('init')
+    .description('Set up your OpenAI and GitHub tokens')
+    .action(handleInit);
+
+  program
+    .command('config')
+    .description(
+      'Get/set git-chimp configuration in .git-chimprc (JSON format)'
+    )
+    .option('-l, --list', 'List current config')
+    .option('-g, --get <key>', 'Get value by key')
+    .option('-s, --set <key>', 'Set value')
+    .option('-v, --value <val>', 'Value when used with --set')
+    .action(handleConfig);
 
   program
     .command('commit')
@@ -39,11 +56,6 @@ export function runCLI() {
       'Generate a pull request with GPT based on recent commits'
     )
     .action(handlePR);
-
-  program
-    .command('init')
-    .description('Set up your OpenAI and GitHub tokens')
-    .action(handleInit);
 
   program.parse(process.argv);
 }
