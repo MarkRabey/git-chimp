@@ -31,6 +31,10 @@ export function runCLI() {
 
   program
     .command('pr')
+    .option(
+      '-u, --update',
+      'Automatically update existing PR if it exists'
+    )
     .description(
       'Generate a pull request with GPT based on recent commits'
     )
