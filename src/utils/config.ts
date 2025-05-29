@@ -3,10 +3,8 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 export type ChimpConfig = {
-  config?: {
-    enforceSemanticPrTitles?: boolean;
-    model?: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4o' | 'gpt-4o-mini';
-  };
+  enforceSemanticPrTitles?: boolean;
+  model?: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4o' | 'gpt-4o-mini';
 };
 
 const CONFIG_FILE = path.resolve('.git-chimprc'); // no .json
@@ -40,7 +38,7 @@ export function validatePrTitle(
 ): boolean {
   const isValid = isSemanticPrTitle(title);
 
-  if (!isValid && config.config?.enforceSemanticPrTitles) {
+  if (!isValid && config.enforceSemanticPrTitles) {
     const msg = `❌ PR title "${title}" is not semantic. Expected something like "feat: Add login support"`;
     if (opts.throwOnError) {
       throw new Error(msg);

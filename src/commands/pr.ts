@@ -101,7 +101,7 @@ export async function handlePR(
     const enforceSemantic =
       typeof options.semanticTitle === 'boolean'
         ? options.semanticTitle
-        : (chimpConfig.config?.enforceSemanticPrTitles ?? false);
+        : (chimpConfig.enforceSemanticPrTitles ?? false);
 
     // If enforcing and title is not valid, fix it
     if (enforceSemantic) {

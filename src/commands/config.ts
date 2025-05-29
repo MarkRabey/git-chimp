@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import { loadConfig, saveConfig } from '../utils/config.js';
 import type { ChimpConfig } from '../utils/config.js';
 
-type ConfigKey = keyof NonNullable<ChimpConfig['config']>;
+type ConfigKey = keyof NonNullable<ChimpConfig>;
 type ConfigValue = string | boolean;
 
 export async function handleConfig(cmd: {
@@ -11,19 +11,15 @@ export async function handleConfig(cmd: {
   value?: ConfigValue;
   list?: boolean;
 }) {
-  const cfg = await loadConfig();
-
-  if (!cfg.config) cfg.config = {};
+  const config = await loadConfig();
 
   if (cmd.list) {
-    console.log(
-      chalk.blueBright(JSON.stringify(cfg.config, null, 2))
-    );
+    console.log(chalk.blueBright(JSON.stringify(config, null, 2)));
     process.exit(0);
   }
 
   if (cmd.get) {
-    const value = cfg.config[cmd.get];
+    const value = config[cmd.get];
     console.log(
       value === undefined ? chalk.yellow('(undefined)') : value
     );
@@ -36,8 +32,8 @@ export async function handleConfig(cmd: {
     if (cmd.value === 'true') parsedValue = true;
     else if (cmd.value === 'false') parsedValue = false;
 
-    cfg.config[cmd.set] = parsedValue as any;
-    await saveConfig(cfg);
+    config[cmd.set] = parsedValue as any;
+    await saveConfig(config);
     console.log(chalk.green(`✅ ${cmd.set} set to "${parsedValue}"`));
     process.exit(0);
   }
