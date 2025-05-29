@@ -17,7 +17,7 @@ function ask(question: string): Promise<string> {
 }
 
 export async function handleInit() {
-  console.log('\n🧠 Let’s set up commit-chimp 🐒\n');
+  console.log('\n🧠 Let’s set up git-chimp 🐒\n');
 
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const envPath = path.resolve(__dirname, '../../.env');

@@ -11,7 +11,7 @@ const program = new Command();
 
 export function runCLI() {
   program
-    .name('commit-chimp')
+    .name('git-chimp')
     .description(
       'Automate your commit messages and PRs with GPT. Because writing them sucks.'
     )
