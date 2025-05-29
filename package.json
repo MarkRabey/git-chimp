@@ -25,6 +25,7 @@
   "dependencies": {
     "@octokit/rest": "^22.0.0",
     "chalk": "^5.4.1",
+    "commander": "^14.0.0",
     "dotenv": "^16.5.0",
     "inquirer": "^12.6.3",
     "openai": "^4.103.0",
@@ -35,7 +36,6 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/npm": "^12.0.1",
     "@types/node": "^22.15.21",
-    "commander": "^14.0.0",
     "eslint": "^9.27.0",
     "prettier": "^3.5.3",
     "semantic-release": "^24.2.5",
