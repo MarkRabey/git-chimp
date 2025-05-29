@@ -26,12 +26,12 @@ jobs:
       - name: Show .npmrc
         run: cat ~/.npmrc
 
+      - run: npm ci
+
       - name: Try publishing dry run
         run: npm publish --dry-run
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - run: npm ci
 
       - run: npx semantic-release
         env:
