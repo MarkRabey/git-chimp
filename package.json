@@ -2,7 +2,15 @@
   "name": "commit-chimp",
   "version": "0.1.0",
   "scripts": {
+    "clean": "rm -rf dist",
     "build": "tsc",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build",
+    "pack": "npm pack",
+    "release": "npm run release:patch",
+    "release:patch": "npm run clean && npm run build && npm version patch && git push && git push --tags && npm publish",
+    "release:minor": "npm run clean && npm run build && npm version minor && git push && git push --tags && npm publish",
+    "release:major": "npm run clean && npm run build && npm version major && git push && git push --tags && npm publish",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "type": "module",
