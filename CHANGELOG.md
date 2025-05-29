@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/MarkRabey/git-chimp/compare/v0.2.0...v0.3.0) (2025-05-29)
+
+
+### Features
+
+* **config:** add support for semantic PR title enforcement ([136fa4e](https://github.com/MarkRabey/git-chimp/commit/136fa4e67a4b8d6dd737c98df06629373e4f6a56))
+
 # [0.2.0](https://github.com/MarkRabey/git-chimp/compare/v0.1.0...v0.2.0) (2025-05-29)
 
 
