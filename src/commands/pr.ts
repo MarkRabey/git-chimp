@@ -46,7 +46,44 @@ export async function handlePR() {
 
     const diff = await git.diff(['main', currentBranch]);
     const description = await generatePullRequestDescription(diff);
-    const [owner, repo] = process.env.GITHUB_REPO.split('/');
+
+    let owner, repo;
+
+    if (process.env.GITHUB_REPO) {
+      [owner, repo] = process.env.GITHUB_REPO.split('/');
+    } else {
+      const remotes = await git.getRemotes(true);
+      const originRemote = remotes.find((r) => r.name === 'origin');
+
+      if (!originRemote || !originRemote.refs.fetch) {
+        console.error(
+          chalk.red(
+            '❌ Could not determine the GitHub repository from the remote.'
+          )
+        );
+        process.exit(1);
+      }
+
+      const repoUrl = originRemote.refs.fetch;
+
+      // Extract owner/repo from URLs like:
+      // - git@github.com:owner/repo.git
+      // - https://github.com/owner/repo.git
+      const match = repoUrl.match(
+        /github\.com[/:](.+?)\/(.+?)(\.git)?$/
+      );
+
+      if (!match) {
+        console.error(
+          chalk.red(
+            `❌ Failed to parse GitHub repo from remote URL: ${repoUrl}`
+          )
+        );
+        process.exit(1);
+      }
+
+      [, owner, repo] = match;
+    }
 
     const existingPRs = await octokit.rest.pulls.list({
       owner,
