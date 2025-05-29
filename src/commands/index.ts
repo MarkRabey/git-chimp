@@ -50,8 +50,14 @@ export function runCLI() {
     .command('pr')
     .option(
       '-u, --update',
-      'Automatically update existing PR if it exists'
+      'Automatically update existing PR if it exists',
+      (val) => val !== 'true' // handles true/false as strings
     )
+    .option(
+      '--semantic-title',
+      'Enforce semantic PR titles',
+      (val) => val !== 'false'
+    ) // handles true/false as strings
     .description(
       'Generate a pull request with GPT based on recent commits'
     )

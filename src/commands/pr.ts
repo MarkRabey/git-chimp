@@ -3,6 +3,8 @@ import { simpleGit } from 'simple-git';
 import { Octokit } from '@octokit/rest';
 import { generatePullRequestDescription } from '../lib/openai.js';
 import readline from 'readline';
+import { loadConfig, validatePrTitle } from '../utils/config.js';
+import { guessSemanticPrefix } from '../utils/git.js';
 
 function askUser(question: string): Promise<string> {
   const rl = readline.createInterface({
@@ -17,8 +19,10 @@ function askUser(question: string): Promise<string> {
   });
 }
 
-export async function handlePR() {
-  const shouldAutoUpdate = process.argv.includes('--update');
+export async function handlePR(
+  options: { update?: boolean; semanticTitle?: boolean } = {}
+) {
+  const shouldAutoUpdate = options.update || false;
 
   if (!process.env.GITHUB_TOKEN || !process.env.GITHUB_REPO) {
     console.error(
@@ -65,10 +69,6 @@ export async function handlePR() {
       }
 
       const repoUrl = originRemote.refs.fetch;
-
-      // Extract owner/repo from URLs like:
-      // - git@github.com:owner/repo.git
-      // - https://github.com/owner/repo.git
       const match = repoUrl.match(
         /github\.com[/:](.+?)\/(.+?)(\.git)?$/
       );
@@ -93,6 +93,32 @@ export async function handlePR() {
     });
 
     const existingPR = existingPRs.data[0];
+
+    const chimpConfig = await loadConfig();
+    let prTitle = `🚀 ${currentBranch}`;
+
+    // Decide whether to enforce semantic PR titles
+    const enforceSemantic =
+      typeof options.semanticTitle === 'boolean'
+        ? options.semanticTitle
+        : (chimpConfig.config?.enforceSemanticPrTitles ?? false);
+
+    // If enforcing and title is not valid, fix it
+    if (enforceSemantic) {
+      const isSemantic = validatePrTitle(prTitle, chimpConfig, {
+        throwOnError: false,
+      });
+      if (!isSemantic) {
+        const prefix = guessSemanticPrefix(diff);
+        console.log(
+          chalk.gray(`🤖 Guessed semantic prefix: ${prefix}`)
+        );
+        prTitle = `${prefix}: ${currentBranch}`;
+      }
+    } else {
+      // if not enforcing, just log a warning if not semantic
+      validatePrTitle(prTitle, chimpConfig, { throwOnError: false });
+    }
 
     if (existingPR) {
       console.log(
@@ -130,7 +156,7 @@ export async function handlePR() {
       const pr = await octokit.rest.pulls.create({
         owner,
         repo,
-        title: `🚀 ${currentBranch}`,
+        title: prTitle,
         head: currentBranch,
         base: 'main',
         body: description,

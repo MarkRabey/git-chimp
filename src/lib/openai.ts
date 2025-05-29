@@ -5,7 +5,7 @@ import { loadConfig } from '../utils/config.js';
 config();
 
 const chimpConfig = await loadConfig();
-const model = chimpConfig.model ?? 'gpt-3.5-turbo';
+const model = chimpConfig.config?.model ?? 'gpt-3.5-turbo';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
