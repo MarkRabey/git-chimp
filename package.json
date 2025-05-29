@@ -20,7 +20,7 @@
   "main": "./dist/cli.js",
   "keywords": [],
   "author": "Mark Rabey <mark@markrabey.com> (http://markrabey.com/)",
-  "license": "ISC",
+  "license": "MIT",
   "description": "",
   "dependencies": {
     "@octokit/rest": "^22.0.0",
