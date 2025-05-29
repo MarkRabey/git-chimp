@@ -60,6 +60,15 @@ GITHUB_REPO=username/repo
 
 ## 🧪 CLI Usage
 
+### `config`
+Store project defaults.
+
+```bash
+git-chimp config --list
+git-chimp config --get model
+git-chimp config --set model --value gpt-4o
+```
+
 ### `commit`
 
 ```bash
