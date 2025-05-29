@@ -26,6 +26,9 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Show .npmrc
+        run: cat ~/.npmrc
+
       - run: npm whoami
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
