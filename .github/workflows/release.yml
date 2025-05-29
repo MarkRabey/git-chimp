@@ -23,16 +23,7 @@ jobs:
       - name: Configure npm auth
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
-      - name: Show .npmrc
-        run: cat ~/.npmrc
-
       - run: npm ci
-
-      - name: Try publishing dry run
-        run: npm publish --dry-run
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - run: npx semantic-release
         env:
