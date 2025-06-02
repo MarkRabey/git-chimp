@@ -15,6 +15,10 @@ export type GitChimpConfig = {
     | 'sarcastic'
     | 'enthusiastic'
     | string;
+  changelog?: {
+    useAI?: boolean;
+    groupOrder?: string[];
+  };
 };
 
 export async function loadGitChimpConfig(): Promise<GitChimpConfig> {
