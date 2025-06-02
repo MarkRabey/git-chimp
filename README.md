@@ -76,7 +76,13 @@ GITHUB_REPO=username/repo
     "tone": "sarcastic",
     "prMode": "draft",
     "enforceSemanticPrTitles": true,
-    "enforceConventionalCommits": true
+    "enforceConventionalCommits": true,
+    "changelog": {
+      "aiSummary": true,
+      "output": "CHANGELOG.md",
+      "from": "v1.0.0",
+      "to": "HEAD"
+    }
   }
 }
 ```
@@ -90,6 +96,17 @@ GITHUB_REPO=username/repo
 | `enforceConventionalCommits` | `boolean` | If `true`, commit messages follow conventional commit style: `type(scope): description` (e.g., `feat(auth): add login button`)      
 | `enforceSemanticPrTitles` | `boolean` | If `true`, PR titles follow semantic-release style (e.g., `feat:`)                  |
 | `prMode`                  | `string`  | One of: `open` (default), `draft`, or `display` (just show the PR content)          |
+| `changelog`               | `object`  | Options for changelog generation (see below)                                        |
+
+If you include a `changelog` object, it supports the following:
+| `changelog` key | Type      | Description                                                             |
+| --------------- | --------- | ----------------------------------------------------------------------- |
+| `aiSummary`     | `boolean` | If `true`, uses OpenAI to generate a summary section for the changelog  |
+| `output`        | `string`  | File path to write or append changelog content (e.g., `"CHANGELOG.md"`) |
+| `from`          | `string`  | Git tag or commit to start from (e.g., `"v1.0.0"`)                      |
+| `to`            | `string`  | Git ref to end at (defaults to `HEAD` if omitted)                       |
+
+You can override any of these with CLI flags when running `git-chimp changelog`.
 
 
 ### Command-Line Overrides
@@ -150,6 +167,24 @@ Generates a PR description and opens one on GitHub.
 | `--pr-mode <mode>` | One of: `open`, `draft`, or `display`                                  |
 | `--semantic-title` | Enforce semantic PR titles                                             |
 | `-u`, `--update`   | Updates an existing PR instead of creating a new one (if it exists)    |
+
+### `changelog`
+
+```bash
+git-chimp changelog
+```
+
+Generates a changelog from commit history, optionally summarized with AI.
+
+#### Options:
+
+| Flag               | Description                                                                 |
+| ------------------ | --------------------------------------------------------------------------- |
+| `--from <tag>`     | Git tag or commit to start from (defaults to latest tag)                    |
+| `--to <ref>`       | Git ref to end at (defaults to `HEAD`)                                      |
+| `--output <file>`  | Path to a file to append the changelog to                                   |
+| `--ai`             | Use OpenAI to generate a summary section                                    |
+
 
 ---
 ## 💡 Pro Tip

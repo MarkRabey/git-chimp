@@ -4,7 +4,11 @@
     "tone": "sarcastic",
     "prMode": "draft",
     "enforceSemanticPrTitles": true,
-    "enforceConventionalCommits": true
+    "enforceConventionalCommits": true,
+    "changelog": {
+      "useAI": true,
+      "groupOrder": ["feat", "fix", "docs", "chore"]
+    }
   },
   "docChimp": {
     "outputDir": "docs"

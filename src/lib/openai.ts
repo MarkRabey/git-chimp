@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
+import type { DefaultLogFields, ListLogLine } from 'simple-git';
 import OpenAI from 'openai';
 
 config();
@@ -96,4 +97,21 @@ Include a brief summary of the changes, mention any important context, and highl
     completion.choices[0].message.content?.trim() ||
     'This PR contains general updates and improvements.'
   );
+}
+
+export async function generateChangelogEntries(
+  commits: (DefaultLogFields & ListLogLine)[],
+  tone = 'concise',
+  model = 'gpt-4'
+): Promise<string> {
+  const messages = commits.map((c) => `- ${c.message}`).join('\n');
+
+  const prompt = `You are a release manager. Given these commit messages, summarize the changes and write a professional changelog summary in a ${tone} tone:\n\n${messages}`;
+
+  const response = await openai.chat.completions.create({
+    messages: [{ role: 'user', content: prompt }],
+    model,
+  });
+
+  return response.choices[0].message.content ?? '';
 }
