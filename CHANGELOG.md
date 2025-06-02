@@ -1,3 +1,10 @@
+# [0.6.0](https://github.com/MarkRabey/git-chimp/compare/v0.5.0...v0.6.0) (2025-06-02)
+
+
+### Features
+
+* add AI summary generation and changelog group ordering ([#12](https://github.com/MarkRabey/git-chimp/issues/12)) ([536a3e0](https://github.com/MarkRabey/git-chimp/commit/536a3e0d38e8e6135dd73c4d315b4d3c9df4c4d5))
+
 # [0.5.0](https://github.com/MarkRabey/git-chimp/compare/v0.4.3...v0.5.0) (2025-06-02)
 
 
