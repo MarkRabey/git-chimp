@@ -1,0 +1,9 @@
+{
+  "gitChimp": {
+    "model": "gpt-3.5-turbo",
+    "tone": "sarcastic",
+    "prMode": "draft",
+    "enforceSemanticPrTitles": true,
+    "enforceConventionalCommits": true
+  }
+}

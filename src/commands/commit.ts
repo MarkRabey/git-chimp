@@ -7,6 +7,7 @@ import {
   GitChimpConfig,
   loadGitChimpConfig,
 } from '../utils/config.js';
+import { isConventionalCommit } from '../utils/git.js';
 
 const git = simpleGit();
 
@@ -14,6 +15,7 @@ export async function handleCommitCommand(
   cliOptions?: Partial<GitChimpConfig> & {
     custom?: boolean;
     message?: boolean;
+    enforceCc?: boolean;
   }
 ) {
   const fileConfig = await loadGitChimpConfig();
@@ -21,6 +23,9 @@ export async function handleCommitCommand(
     ...fileConfig,
     ...cliOptions,
   };
+
+  const enforceCommits =
+    config.enforceConventionalCommits || cliOptions?.enforceCc;
 
   const useCustomMessage = cliOptions?.custom || false;
   const messageMode = cliOptions?.message || false;
@@ -44,9 +49,23 @@ export async function handleCommitCommand(
             input.length > 0 || 'Message cannot be empty!',
         },
       ]);
+      if (enforceCommits && !isConventionalCommit(customMessage)) {
+        console.log(
+          chalk.red(
+            '❌ Commit message does not follow Conventional Commit format.'
+          )
+        );
+        console.log(
+          chalk.yellow(
+            'Expected format: "type(scope): description"\nExample: "feat(auth): add login button"'
+          )
+        );
+        process.exit(1);
+      }
+
       await git.commit(customMessage);
       console.log(chalk.green('✅ Commit created!'));
-      return;
+      process.exit(0);
     }
 
     // 2. Non-interactive mode (for piping)
@@ -101,6 +120,19 @@ export async function handleCommitCommand(
       finalMessage = customMessage;
     }
 
+    if (enforceCommits && !isConventionalCommit(finalMessage)) {
+      console.log(
+        chalk.red(
+          '❌ Commit message does not follow Conventional Commit format.'
+        )
+      );
+      console.log(
+        chalk.yellow(
+          'Expected format: "type(scope): description"\nExample: "feat(auth): add login button"'
+        )
+      );
+      process.exit(1);
+    }
     await git.commit(finalMessage);
     console.log(chalk.green('✅ Commit created!'));
   } catch (error) {

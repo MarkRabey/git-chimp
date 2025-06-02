@@ -6,6 +6,7 @@ export type ChimpNamespace = 'gitChimp' | 'docChimp';
 
 export type GitChimpConfig = {
   enforceSemanticPrTitles?: boolean;
+  enforceConventionalCommits?: boolean;
   model?: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4o' | 'gpt-4o-mini';
   prMode?: 'open' | 'draft' | 'display';
   tone?:
