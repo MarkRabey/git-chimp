@@ -4,8 +4,8 @@ import { Octokit } from '@octokit/rest';
 import { generatePullRequestDescription } from '../lib/openai.js';
 import readline from 'readline';
 import {
-  ChimpConfig,
-  loadConfig,
+  GitChimpConfig,
+  loadGitChimpConfig,
   validatePrTitle,
 } from '../utils/config.js';
 import { guessSemanticPrefix } from '../utils/git.js';
@@ -24,15 +24,15 @@ function askUser(question: string): Promise<string> {
 }
 
 export async function handlePR(
-  cliOptions?: Partial<ChimpConfig> & {
+  cliOptions?: Partial<GitChimpConfig> & {
     update?: boolean;
     prMode?: 'open' | 'draft' | 'display';
   }
 ) {
   const shouldAutoUpdate = !!cliOptions?.update;
 
-  const fileConfig = await loadConfig(); // from .git-chimprc
-  const config: ChimpConfig = {
+  const fileConfig = await loadGitChimpConfig(); // from .git-chimprc
+  const config: GitChimpConfig = {
     ...fileConfig,
     ...cliOptions,
   };

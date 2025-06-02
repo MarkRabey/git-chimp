@@ -3,18 +3,21 @@ import { simpleGit } from 'simple-git';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import { cleanCommitMessages } from '../utils/format.js';
-import { ChimpConfig, loadConfig } from '../utils/config.js';
+import {
+  GitChimpConfig,
+  loadGitChimpConfig,
+} from '../utils/config.js';
 
 const git = simpleGit();
 
 export async function handleCommitCommand(
-  cliOptions?: Partial<ChimpConfig> & {
+  cliOptions?: Partial<GitChimpConfig> & {
     custom?: boolean;
     message?: boolean;
   }
 ) {
-  const fileConfig = await loadConfig();
-  const config: ChimpConfig = {
+  const fileConfig = await loadGitChimpConfig();
+  const config: GitChimpConfig = {
     ...fileConfig,
     ...cliOptions,
   };

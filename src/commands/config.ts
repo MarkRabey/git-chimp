@@ -1,8 +1,11 @@
 import chalk from 'chalk';
-import { loadConfig, saveConfig } from '../utils/config.js';
-import type { ChimpConfig } from '../utils/config.js';
+import {
+  loadGitChimpConfig,
+  saveGitChimpConfig,
+} from '../utils/config.js';
+import type { GitChimpConfig } from '../utils/config.js';
 
-type ConfigKey = keyof NonNullable<ChimpConfig>;
+type ConfigKey = keyof NonNullable<GitChimpConfig>;
 type ConfigValue = string | boolean;
 
 export async function handleConfig(cmd: {
@@ -11,7 +14,7 @@ export async function handleConfig(cmd: {
   value?: ConfigValue;
   list?: boolean;
 }) {
-  const config = await loadConfig();
+  const config = await loadGitChimpConfig();
 
   if (cmd.list) {
     console.log(chalk.blueBright(JSON.stringify(config, null, 2)));
@@ -33,7 +36,7 @@ export async function handleConfig(cmd: {
     else if (cmd.value === 'false') parsedValue = false;
 
     config[cmd.set] = parsedValue as any;
-    await saveConfig(config);
+    await saveGitChimpConfig(config);
     console.log(chalk.green(`✅ ${cmd.set} set to "${parsedValue}"`));
     process.exit(0);
   }
