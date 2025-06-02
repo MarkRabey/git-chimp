@@ -62,16 +62,22 @@ GITHUB_REPO=username/repo
 
 ## 🛠 Configuration
 
-`git-chimp` supports configuration via a `.git-chimprc` file at the root of your repo. This should be a plain JSON file (no .json extension).
+> [!WARNING]  
+> The `.git-chimprc` file has been replaced with `.chimprc`. It will, however, continue to work - for now.
 
-### Example `.git-chimprc`:
+`git-chimp` supports configuration via the `gitChimp` namespace in a `.chimprc` file at the root of your repo. This should be a plain JSON file (no .json extension).
+
+### Example `.chimprc`:
 
 ```json
 {
-  "tone": "sarcastic",
-  "enforceSemanticPrTitles": true,
-  "model": "gpt-4o",
-  "prMode": "draft"
+  "gitChimp": {
+    "model": "gpt-3.5-turbo",
+    "tone": "sarcastic",
+    "prMode": "draft",
+    "enforceSemanticPrTitles": true,
+    "enforceConventionalCommits": true
+  }
 }
 ```
 
@@ -81,18 +87,19 @@ GITHUB_REPO=username/repo
 | ------------------------- | --------- | ----------------------------------------------------------------------------------- |
 | `tone`                    | `string`  | Sets the writing style, e.g., `"corporate-safe"`, `"dry sarcasm"`, `"chaotic evil"` |
 | `model`                   | `string`  | OpenAI model to use. One of: `gpt-3.5-turbo`, `gpt-4`, `gpt-4o`, `gpt-4o-mini`      |
+| `enforceConventionalCommits` | `boolean` | If `true`, commit messages follow conventional commit style: `type(scope): description` (e.g., `feat(auth): add login button`)      
 | `enforceSemanticPrTitles` | `boolean` | If `true`, PR titles follow semantic-release style (e.g., `feat:`)                  |
 | `prMode`                  | `string`  | One of: `open` (default), `draft`, or `display` (just show the PR content)          |
 
 
 ### Command-Line Overrides
-You can also override certain config options via CLI flags (these take precedence over `.git-chimprc`):
+You can also override certain config options via CLI flags (these take precedence over `.chimprc`):
 
 ```bash
 git-chimp pr --tone "inspired by Linus Torvalds" --model gpt-4o --pr-mode draft
 ```
 
-That would skip enforcing semantic PR title style for that invocation, regardless of the `.git-chimprc` setting.
+That would skip enforcing semantic PR title style for that invocation, regardless of the `.chimprc` setting.
 
 ---
 
@@ -121,6 +128,7 @@ git-chimp commit
 | ----------------- | ------------------------------------------------------------------------ |
 | `--tone <style>`  | Optional writing style for commit messages (e.g., `"corporate-safe"`)    |
 | `--model <model>` | OpenAI model to use (e.g., `gpt-3.5-turbo`, `gpt-4o`)                    |
+| `--enfore-cc `    | Enforce conventional commit messages                                     |
 | `-c`, `--custom`  | Use your own lovingly typed commit message (you beautiful control freak) |
 | `-m`, `--message` | Print GPT commit messages to stdout and exit (good for CI, scripting)    |
 
@@ -140,6 +148,7 @@ Generates a PR description and opens one on GitHub.
 | `--tone <style>`   | Optional writing style for the PR (e.g., `"professional"`, `"snarky"`) |
 | `--model <model>`  | OpenAI model to use for generation                                     |
 | `--pr-mode <mode>` | One of: `open`, `draft`, or `display`                                  |
+| `--semantic-title` | Enforce semantic PR titles                                             |
 | `-u`, `--update`   | Updates an existing PR instead of creating a new one (if it exists)    |
 
 ---
@@ -148,7 +157,7 @@ The config system is merge-friendly. It works like this (highest priority wins):
 
 Command-line flags (e.g., --tone)
 
-.git-chimprc config
+.chimprc config
 
 Defaults baked into the tool
 
