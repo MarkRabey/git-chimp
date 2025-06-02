@@ -26,7 +26,7 @@ export function runCLI() {
   program
     .command('config')
     .description(
-      'Get/set git-chimp configuration in .git-chimprc (JSON format)'
+      'Get/set git-chimp configuration in .chimprc (JSON format)'
     )
     .option('-l, --list', 'List current config')
     .option('-g, --get <key>', 'Get value by key')

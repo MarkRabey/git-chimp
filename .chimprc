@@ -5,5 +5,8 @@
     "prMode": "draft",
     "enforceSemanticPrTitles": true,
     "enforceConventionalCommits": true
+  },
+  "docChimp": {
+    "outputDir": "docs"
   }
 }
