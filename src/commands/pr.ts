@@ -164,6 +164,7 @@ export async function handlePR(
           repo,
           pull_number: existingPR.number,
           body: description,
+          draft: prMode === 'draft',
         });
         console.log(chalk.green('✅ PR updated successfully.'));
       } else {
@@ -191,6 +192,7 @@ export async function handlePR(
         head: currentBranch,
         base: 'main',
         body: description,
+        draft: prMode === 'draft',
       });
 
       console.log(
