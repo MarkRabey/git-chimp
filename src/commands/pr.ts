@@ -1,14 +1,16 @@
 import chalk from 'chalk';
 import { simpleGit } from 'simple-git';
 import { Octokit } from '@octokit/rest';
-import { generatePullRequestDescription } from '../lib/openai.js';
+import {
+  generatePullRequestDescription,
+  generatePullRequestTitle,
+} from '../lib/openai.js';
 import readline from 'readline';
 import {
-  ChimpConfig,
-  loadConfig,
+  GitChimpConfig,
+  loadGitChimpConfig,
   validatePrTitle,
 } from '../utils/config.js';
-import { guessSemanticPrefix } from '../utils/git.js';
 
 function askUser(question: string): Promise<string> {
   const rl = readline.createInterface({
@@ -24,15 +26,15 @@ function askUser(question: string): Promise<string> {
 }
 
 export async function handlePR(
-  cliOptions?: Partial<ChimpConfig> & {
+  cliOptions?: Partial<GitChimpConfig> & {
     update?: boolean;
     prMode?: 'open' | 'draft' | 'display';
   }
 ) {
   const shouldAutoUpdate = !!cliOptions?.update;
 
-  const fileConfig = await loadConfig(); // from .git-chimprc
-  const config: ChimpConfig = {
+  const fileConfig = await loadGitChimpConfig(); // from .git-chimprc
+  const config: GitChimpConfig = {
     ...fileConfig,
     ...cliOptions,
   };
@@ -66,15 +68,22 @@ export async function handlePR(
 
     // If enforcing and title is not valid, fix it
     if (config.enforceSemanticPrTitles) {
+      prTitle = await generatePullRequestTitle(
+        diff,
+        currentBranch,
+        config.model
+      );
       const isSemantic = validatePrTitle(prTitle, config, {
         throwOnError: false,
       });
       if (!isSemantic) {
-        const prefix = guessSemanticPrefix(diff);
-        console.log(
-          chalk.gray(`🤖 Guessed semantic prefix: ${prefix}`)
-        );
-        prTitle = `${prefix}: ${currentBranch}`;
+        if (!isSemantic) {
+          console.warn(
+            chalk.yellow(
+              `🤔 Generated PR title still isn't semantic: "${prTitle}"`
+            )
+          );
+        }
       }
     } else {
       // if not enforcing, just log a warning if not semantic
@@ -164,6 +173,7 @@ export async function handlePR(
           repo,
           pull_number: existingPR.number,
           body: description,
+          draft: prMode === 'draft',
         });
         console.log(chalk.green('✅ PR updated successfully.'));
       } else {
@@ -191,6 +201,7 @@ export async function handlePR(
         head: currentBranch,
         base: 'main',
         body: description,
+        draft: prMode === 'draft',
       });
 
       console.log(

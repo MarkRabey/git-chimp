@@ -26,3 +26,9 @@ export function guessSemanticPrefix(diff: string): string {
   // Fall back to 'chore' if nothing matches
   return 'chore';
 }
+
+export function isConventionalCommit(msg: string): boolean {
+  return /^(feat|fix|chore|docs|style|refactor|perf|test)(\([\w\-]+\))?: .+/.test(
+    msg
+  );
+}

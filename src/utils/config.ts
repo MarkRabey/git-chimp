@@ -2,8 +2,11 @@ import chalk from 'chalk';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-export type ChimpConfig = {
+export type ChimpNamespace = 'gitChimp' | 'docChimp';
+
+export type GitChimpConfig = {
   enforceSemanticPrTitles?: boolean;
+  enforceConventionalCommits?: boolean;
   model?: 'gpt-3.5-turbo' | 'gpt-4' | 'gpt-4o' | 'gpt-4o-mini';
   prMode?: 'open' | 'draft' | 'display';
   tone?:
@@ -14,21 +17,56 @@ export type ChimpConfig = {
     | string;
 };
 
-const CONFIG_FILE = path.resolve('.git-chimprc'); // no .json
+export async function loadGitChimpConfig(): Promise<GitChimpConfig> {
+  const chimpRcPath = path.resolve('.chimprc');
+  const gitChimpRcPath = path.resolve('.git-chimprc');
 
-export async function loadConfig(): Promise<ChimpConfig> {
+  // Try .chimprc first (namespaced)
   try {
-    const str = await fs.readFile(CONFIG_FILE, 'utf8');
-    return JSON.parse(str);
+    const file = await fs.readFile(chimpRcPath, 'utf8');
+    const json = JSON.parse(file);
+    if (json?.gitChimp) return json.gitChimp as GitChimpConfig;
   } catch {
-    return {};
+    /* ignore */
   }
+
+  // Then try .git-chimprc (flat structure)
+  try {
+    const file = await fs.readFile(gitChimpRcPath, 'utf8');
+    const json = JSON.parse(file);
+    console.warn(
+      chalk.yellow(
+        '⚠️  .git-chimprc is deprecated. Please migrate your config to `.chimprc` under the `gitChimp` namespace.'
+      )
+    );
+    return json as GitChimpConfig;
+  } catch {
+    /* ignore */
+  }
+
+  return {};
 }
 
-export async function saveConfig(obj: Record<string, any>) {
+export async function saveGitChimpConfig(newConfig: GitChimpConfig) {
+  const chimpRcPath = path.resolve('.chimprc');
+
+  let existing: any = {};
+  try {
+    const file = await fs.readFile(chimpRcPath, 'utf8');
+    existing = JSON.parse(file);
+  } catch {
+    // File doesn't exist or is empty
+    existing = {};
+  }
+
+  existing.gitChimp = {
+    ...(existing.gitChimp || {}),
+    ...newConfig,
+  };
+
   await fs.writeFile(
-    CONFIG_FILE,
-    JSON.stringify(obj, null, 2) + '\n'
+    chimpRcPath,
+    JSON.stringify(existing, null, 2) + '\n'
   );
 }
 
@@ -40,7 +78,7 @@ export function isSemanticPrTitle(title: string): boolean {
 
 export function validatePrTitle(
   title: string,
-  config: ChimpConfig,
+  config: GitChimpConfig,
   opts: { throwOnError?: boolean } = {}
 ): boolean {
   const isValid = isSemanticPrTitle(title);

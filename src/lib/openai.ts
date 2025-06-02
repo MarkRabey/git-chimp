@@ -1,11 +1,7 @@
 import { config } from 'dotenv';
 import OpenAI from 'openai';
-import { loadConfig } from '../utils/config.js';
 
 config();
-
-const chimpConfig = await loadConfig();
-// const model = chimpConfig.model ?? 'gpt-3.5-turbo';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
@@ -36,6 +32,44 @@ Messages should be short, use present tense, and follow conventional commit styl
   const raw = completion.choices[0].message.content?.trim() || '';
   const lines = raw.split('\n').filter((line) => line.trim() !== '');
   return lines.slice(0, count); // Just in case the model got a little too chatty
+}
+
+export async function generatePullRequestTitle(
+  diff: string,
+  currentBranch?: string,
+  model: string = 'gpt-3.5-turbo'
+): Promise<string> {
+  const systemPrompt = `You are an assistant that generates semantic PR titles following the Conventional Commits format.`;
+  const branchMessage = currentBranch
+    ? `Branch: ${currentBranch}`
+    : '';
+  const userPrompt = `
+Here is a git diff. Generate a semantic PR title (one line) based on the changes.
+Only return the title, nothing else.
+Examples:
+- feat: add user authentication
+- fix: correct API response formatting
+- docs: update README with setup instructions
+
+Git diff:
+${diff}
+
+${branchMessage}
+`;
+
+  const res = await openai.chat.completions.create({
+    model,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+    temperature: 0.2,
+  });
+
+  return (
+    res.choices[0].message.content?.trim() ??
+    'chore: update something'
+  );
 }
 
 export async function generatePullRequestDescription(
