@@ -1,3 +1,10 @@
+# [0.5.0](https://github.com/MarkRabey/git-chimp/compare/v0.4.3...v0.5.0) (2025-06-02)
+
+
+### Features
+
+* add function to generate semantic PR titles based on git diff ([#11](https://github.com/MarkRabey/git-chimp/issues/11)) ([22494a5](https://github.com/MarkRabey/git-chimp/commit/22494a526e913d7ffdee11280e7893632bb1927e))
+
 ## [0.4.3](https://github.com/MarkRabey/git-chimp/compare/v0.4.2...v0.4.3) (2025-05-29)
 
 
