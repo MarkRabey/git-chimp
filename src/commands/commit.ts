@@ -65,7 +65,12 @@ export async function handleCommitCommand(
     }
 
     // 3. Interactive picker (default flow)
-    const rawSuggestions = await generateCommitMessages(diff);
+    const rawSuggestions = await generateCommitMessages(
+      diff,
+      3,
+      config.tone,
+      config.model
+    );
     const messages = cleanCommitMessages(rawSuggestions);
     messages.push('✏️ Write my own');
 
