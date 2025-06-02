@@ -19,7 +19,6 @@
 - ⚙️ Setup wizard to configure OpenAI and GitHub tokens
 - 🧃 Options to run in interactive or non-interactive mode
 - 🫣 Optional fallback to detect your repo from `.git/config`
-- 🪄 Coming soon: `--tone`, changelog generation, emoji styles, config files, and naming templates
 
 ---
 
@@ -194,7 +193,7 @@ alias gp='git-chimp pr'
 
 Here’s what’s cooking in the banana lab:
 
-- 🎭 `--tone` option for different writing styles: _e.g., “corporate-safe”, “dry sarcasm”, “inspired by Linus Torvalds”_
+- ~~🎭 `--tone` option for different writing styles: _e.g., “corporate-safe”, “dry sarcasm”, “inspired by Linus Torvalds”_~~ *added in v0.4.3*
 - 📓 `git-chimp changelog` – auto-generate changelogs from commits
 - 🍿 Emoji support and Conventional Commit modes
 - ⚙️ `.chimpconfig` file for personal and team-level preferences
